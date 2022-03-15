@@ -1,19 +1,25 @@
-<div class="camera">
+<div class="camera" style="position: relative;">
     <video id="video">Video stream not available.</video>
     <button id="startbutton">Take photo</button>
+    <!-- <div
+        style="position: absolute; width: 540px; height: 324px; border: 4px #FFF solid;border-radius: 20px; left: 50px; top: 78px">
+    </div> -->
+    <div
+        style="position: absolute; width: 270px; height: 162px; border: 4px #FFF solid;border-radius: 20px; left: 25px; top: 39px">
+    </div>
 </div>
 <canvas id="canvas">
 </canvas>
-<img class="output">
-<img id="photo" alt="The screen capture will appear in this box.">
-</img>
+<img id="photo">
+<canvas id="canvas2">
+</canvas>
 <div id="error">
 
 </div>
 <script>
     (function () {
         var width = 320;    // We will scale the photo width to this
-        var height = 0;     // This will be computed based on the input stream
+        var height = 240;     // This will be computed based on the input stream
 
         var streaming = false;
 
@@ -39,7 +45,7 @@
                 });
             video.addEventListener('canplay', function (ev) {
                 if (!streaming) {
-                    height = video.videoHeight / (video.videoWidth / width);
+                    // height = video.videoHeight / (video.videoWidth / width);
 
                     video.setAttribute('width', width);
                     video.setAttribute('height', height);
@@ -52,7 +58,7 @@
                 takepicture();
                 ev.preventDefault();
             }, false);
-            clearphoto();
+            // clearphoto();
         }
         function clearphoto() {
             var context = canvas.getContext('2d');
@@ -67,10 +73,18 @@
             if (width && height) {
                 canvas.width = width;
                 canvas.height = height;
-                context.drawImage(video, 0, 0, width, height);
+                // context.drawImage(video, 0, 0, width, height);
+                context.drawImage(video, 50, 78, 540, 324, 25, 39, 270, 162);
 
                 var data = canvas.toDataURL('image/png');
                 photo.setAttribute('src', data);
+
+                // context.fillStyle = "#AAA";
+                // context.fillRect(0, 0, canvas.width, canvas.height);
+                // context.drawImage(photo, 0, 0, width, height, 24, 38, 270, 162);
+                // context.drawImage(photo, 25, 39, 270, 162);
+                // context.drawImage(photo, 0, 0, width, height);
+
             } else {
                 clearphoto();
             }
