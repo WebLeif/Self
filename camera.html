@@ -7,6 +7,7 @@
     }
 
     #video {
+        width: 100%;
         position: absolute;
         transform: translate(-50%, -50%);
         left: 50%;
@@ -31,17 +32,19 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        /* position: absolute; */
+        position: absolute;
         left: 0;
         top: 0;
     }
+
+    button {
+        width: 150px;
+        height: 100px;
+        font-size: 50px;
+    }
 </style>
 <div id="camera">
-    <video id="video">Video stream not
-        available.</video>
-    <!-- <div
-        style="position: absolute; width: 540px; height: 324px; border: 4px #FFF solid;border-radius: 20px; left: 50px; top: 78px">
-    </div> -->
+    <video id="video">Video stream not available.</video>
     <div id="side">
         <div id="canvasDiv" style="display:none;">
             <canvas id="canvas">
@@ -49,18 +52,29 @@
         </div>
     </div>
 </div>
-<button id="startbutton">Take photo</button>
-
+<div>
+    <button id="startbutton">喀嚓</button>
+    <br>
+    <button id="lbutton" style="display: none;">左旋</button>
+    <button id="rbutton" style="display: none;">右璇</button>
+    <br>
+    <button id="enterbutton" style="display: none;">確認</button>
+    <button id="resetbutton" style="display: none;">取消</button>
+</div>
 <img id="photo">
-<canvas id="canvas2">
+<canvas id="canvas2" style="display: none;">
 </canvas>
 <div id="error">
 
 </div>
 <script>
     (function () {
-        var width = 320;    // We will scale the photo width to this
-        var height = 240;     // This will be computed based on the input stream
+        var width;    // We will scale the photo width to this
+        var height;     // This will be computed based on the input stream
+        // 剪裁大小
+        let IDWidth = 430;
+        let IDHeight = 270;
+        let angle = 0;
 
         var streaming = false;
 
@@ -68,20 +82,28 @@
         var video = null;
         var side = null;
         var canvas = null;
+        var canvas2 = null;
         var canvasDiv = null;
         var photo = null;
         var startbutton = null;
+        var enterbutton = null;
+        var resetbutton = null;
+        var rbutton = null;
+        var lbutton = null;
         var error = null;
-        let IDWidth = 430;
-        let IDHeight = 270;
         function startup() {
             camera = document.getElementById('camera');
             video = document.getElementById('video');
             side = document.getElementById('side');
             canvas = document.getElementById('canvas');
+            canvas2 = document.getElementById('canvas2');
             canvasDiv = document.getElementById('canvasDiv');
             photo = document.getElementById('photo');
             startbutton = document.getElementById('startbutton');
+            enterbutton = document.getElementById('enterbutton');
+            resetbutton = document.getElementById('resetbutton');
+            rbutton = document.getElementById('rbutton');
+            lbutton = document.getElementById('lbutton');
             error = document.getElementById('error');
             navigator.mediaDevices.getUserMedia({ video: true, audio: false })
                 .then(function (stream) {
@@ -94,35 +116,49 @@
                 });
             video.addEventListener('canplay', function (ev) {
                 if (!streaming) {
-                    // height = video.videoHeight / (video.videoWidth / width);
-
                     error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}`
 
-                    video.setAttribute('width', video.videoWidth + 'px');
-                    video.setAttribute('height', video.videoHeight + 'px');
-                    // video.setAttribute('height', height);
-                    // canvas.setAttribute('width', '100%');
-                    // canvas.setAttribute('height', height);
                     width = video.videoWidth;
                     height = video.videoHeight;
-                    // canvasDiv.style.width = '100%';
-                    // canvasDiv.style.height = video.offsetHeight + 'px';
-                    // canvas.style.width = video.videoWidth + 'px';
-                    // canvas.style.height = video.videoHeight + 'px';
-
-                    streaming = true;
-                    // IDWidth = parseInt(camera.offsetWidth * 0.8);
-                    // IDHeight = parseInt(IDWidth * 54 / 86);
+                    canvas.style.width = video.offsetWidth + 'px';
+                    canvas.style.height = video.offsetHeight + 'px';
                     side.style.width = IDWidth + 'px';
                     side.style.height = IDHeight + 'px';
-                    // side.style.left = parseInt((camera.offsetWidth - IDWidth) / 2) + "px";
-                    // side.style.top = parseInt((camera.offsetHeight - IDHeight) / 2) + "px";
-                    // camera.scrollTo((camera.offsetWidth - video.videoWidth) / 2, (camera.offsetHeight - video.videoHeight) / 2);
-
+                    streaming = true;
                 }
             }, false);
             startbutton.addEventListener('click', function (ev) {
                 takepicture();
+                startbutton.style.display = "none";
+                video.style.display = "none";
+                enterbutton.style.removeProperty('display');
+                rbutton.style.removeProperty('display');
+                lbutton.style.removeProperty('display');
+                ev.preventDefault();
+            }, false);
+            rbutton.addEventListener('click', function (ev) {
+                canvaRrotate(90);
+                ev.preventDefault();
+            }, false);
+            lbutton.addEventListener('click', function (ev) {
+                canvaRrotate(90);
+                ev.preventDefault();
+            }, false);
+            enterbutton.addEventListener('click', function (ev) {
+                enterpicture();
+                rbutton.style.display = "none";
+                lbutton.style.display = "none";
+                resetbutton.style.removeProperty('display');
+                ev.preventDefault();
+            }, false);
+            resetbutton.addEventListener('click', function (ev) {
+                startbutton.style.removeProperty('display');
+                rbutton.style.display = "none";
+                lbutton.style.display = "none";
+                enterbutton.style.display = "none";
+                resetbutton.style.display = "none";
+                canvasDiv.style.display = "none";
+                video.style.removeProperty('display');
                 ev.preventDefault();
             }, false);
             // clearphoto();
@@ -137,27 +173,81 @@
         }
         function takepicture() {
             var context = canvas.getContext('2d');
-            console.log(width, height, canvas.offsetWidth, canvas.offsetHeight)
             if (width && height) {
                 canvas.width = width;
                 canvas.height = height;
+                canvas.style.width = video.offsetWidth + 'px';
+                canvas.style.height = video.offsetHeight + 'px';
                 context.drawImage(video, 0, 0, width, height);
-                // context.drawImage(video, 50, 78, 540, 324, 25, 39, 270, 162);
                 canvasDiv.style.removeProperty('display');
-                // console.log('canvasDiv SCROLL:',)
                 canvasDiv.scrollTo((canvas.offsetWidth - canvasDiv.offsetWidth) / 2, (canvas.offsetHeight - canvasDiv.offsetHeight) / 2);
                 var data = canvas.toDataURL('image/png');
+                photo.setAttribute('width', canvas.offsetWidth);
+                photo.setAttribute('height', canvas.offsetHeight);
                 photo.setAttribute('src', data);
-
-                // context.fillStyle = "#AAA";
-                // context.fillRect(0, 0, canvas.width, canvas.height);
-                // context.drawImage(photo, 0, 0, width, height, 24, 38, 270, 162);
-                // context.drawImage(photo, 25, 39, 270, 162);
-                // context.drawImage(photo, 0, 0, width, height);
-
             } else {
                 clearphoto();
             }
+        }
+        function enterpicture() {
+            var m = canvas.width / canvas.offsetWidth;
+            canvas2.width = IDWidth;
+            canvas2.height = IDHeight;
+            photo.width = IDWidth;
+            photo.height = IDHeight;
+            var context = canvas2.getContext('2d');
+            context.drawImage(canvas, (0 + canvasDiv.scrollLeft) * m, (0 + canvasDiv.scrollTop) * m, IDWidth * m, IDHeight * m, 0, 0, IDWidth, IDHeight);
+            var data = canvas2.toDataURL('image/png');
+            photo.setAttribute('src', data);
+        }
+        function canvaRrotate(n) {
+            var context = canvas.getContext('2d');
+            angle += 90;
+            if (angle >= 360)
+                angle -= 360;
+            if (angle <= -360)
+                angle += 360;
+            switch (angle) {
+                case 0:
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.style.width = photo.offsetWidth + 'px';
+                    canvas.style.height = photo.offsetHeight + 'px';
+                    context.rotate(angle * Math.PI / 180);
+                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, 0, 0, photo.offsetWidth, photo.offsetHeight);
+                    break;
+                case 90:
+                case -270:
+                    canvas.width = height;
+                    canvas.height = width;
+                    canvas.style.width = photo.offsetHeight + 'px';
+                    canvas.style.height = photo.offsetWidth + 'px';
+                    context.rotate(angle * Math.PI / 180);
+                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, 0, -height, photo.offsetWidth, photo.offsetHeight);
+                    break;
+                case 180:
+                case -180:
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.style.width = photo.offsetWidth + 'px';
+                    canvas.style.height = photo.offsetHeight + 'px';
+                    context.rotate(angle * Math.PI / 180);
+                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, -width, -height, photo.offsetWidth, photo.offsetHeight);
+                    break;
+                case 270:
+                case -90:
+
+                    canvas.width = height;
+                    canvas.height = width;
+                    canvas.style.width = photo.offsetHeight + 'px';
+                    canvas.style.height = photo.offsetWidth + 'px';
+                    context.rotate(angle * Math.PI / 180);
+                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, -width, 0, photo.offsetWidth, photo.offsetHeight);
+                    break;
+            }
+        }
+        function Langle() {
+
         }
         // 加载完毕后开始运行
         window.addEventListener("load", startup, false);
