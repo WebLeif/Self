@@ -1,9 +1,11 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <style>
     #camera {
         position: relative;
         overflow: hidden;
         width: 100%;
         height: 40%;
+        transition: 1s;
     }
 
     #video {
@@ -38,9 +40,9 @@
     }
 
     button {
-        width: 150px;
-        height: 100px;
-        font-size: 50px;
+        width: 100px;
+        height: 60px;
+        font-size: 20px;
     }
 </style>
 <div id="camera">
@@ -53,7 +55,7 @@
     </div>
 </div>
 <div>
-    <button id="startbutton">喀嚓</button>
+    <button id="startbutton" style="display: none;">喀嚓</button>
     <br>
     <button id="lbutton" style="display: none;">左旋</button>
     <button id="rbutton" style="display: none;">右璇</button>
@@ -72,8 +74,8 @@
         var width;    // We will scale the photo width to this
         var height;     // This will be computed based on the input stream
         // 剪裁大小
-        let IDWidth = 430;
-        let IDHeight = 270;
+        let IDWidth = 258;
+        let IDHeight = 162;
         let angle = 0;
 
         var streaming = false;
@@ -125,7 +127,23 @@
                     side.style.width = IDWidth + 'px';
                     side.style.height = IDHeight + 'px';
                     streaming = true;
+                    startbutton.style.removeProperty('display');
+
                 }
+            }, false);
+            canvas.addEventListener('doubleTap', function (ev) {
+                console.log(1)
+                if (canvas.offsetWidth == photo.offsetWidth) {
+                    canvas.style.width = photo.offsetWidth * 2;
+                    canvas.style.height = photo.offsetHeight * 2;
+                    console.log(12)
+                }
+                else {
+                    canvas.style.width = photo.offsetWidth;
+                    canvas.style.height = photo.offsetHeight;
+                    console.log(13)
+                }
+                ev.preventDefault();
             }, false);
             startbutton.addEventListener('click', function (ev) {
                 takepicture();
@@ -141,7 +159,7 @@
                 ev.preventDefault();
             }, false);
             lbutton.addEventListener('click', function (ev) {
-                canvaRrotate(90);
+                canvaRrotate(-90);
                 ev.preventDefault();
             }, false);
             enterbutton.addEventListener('click', function (ev) {
@@ -202,11 +220,13 @@
         }
         function canvaRrotate(n) {
             var context = canvas.getContext('2d');
-            angle += 90;
+            angle += n;
             if (angle >= 360)
                 angle -= 360;
             if (angle <= -360)
                 angle += 360;
+            console.log(angle, photo.offsetWidth, photo.offsetHeight)
+            let dx, dy;
             switch (angle) {
                 case 0:
                     canvas.width = width;
@@ -214,7 +234,7 @@
                     canvas.style.width = photo.offsetWidth + 'px';
                     canvas.style.height = photo.offsetHeight + 'px';
                     context.rotate(angle * Math.PI / 180);
-                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, 0, 0, photo.offsetWidth, photo.offsetHeight);
+                    dx = dy = 0;
                     break;
                 case 90:
                 case -270:
@@ -223,7 +243,8 @@
                     canvas.style.width = photo.offsetHeight + 'px';
                     canvas.style.height = photo.offsetWidth + 'px';
                     context.rotate(angle * Math.PI / 180);
-                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, 0, -height, photo.offsetWidth, photo.offsetHeight);
+                    dx = 0;
+                    dy = -height;
                     break;
                 case 180:
                 case -180:
@@ -232,7 +253,8 @@
                     canvas.style.width = photo.offsetWidth + 'px';
                     canvas.style.height = photo.offsetHeight + 'px';
                     context.rotate(angle * Math.PI / 180);
-                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, -width, -height, photo.offsetWidth, photo.offsetHeight);
+                    dx = -width;
+                    dy = -height;
                     break;
                 case 270:
                 case -90:
@@ -242,9 +264,12 @@
                     canvas.style.width = photo.offsetHeight + 'px';
                     canvas.style.height = photo.offsetWidth + 'px';
                     context.rotate(angle * Math.PI / 180);
-                    context.drawImage(photo, 0, 0, photo.offsetWidth, photo.offsetHeight, -width, 0, photo.offsetWidth, photo.offsetHeight);
+                    dx = -width;
+                    dy = 0;
                     break;
             }
+            context.drawImage(photo, 0, 0, photo.offsetWidth * 2, photo.offsetHeight * 2, dx, dy, photo.offsetWidth * 2, photo.offsetHeight * 2);
+
         }
         function Langle() {
 
