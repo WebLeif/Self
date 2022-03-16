@@ -1,15 +1,56 @@
-<div class="camera" style="position: relative;">
-    <video id="video">Video stream not available.</video>
-    <button id="startbutton">Take photo</button>
+<style>
+    #camera {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 40%;
+    }
+
+    #video {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        left: 50%;
+        top: 50%;
+    }
+
+    #side {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        border: 4px #FFF solid;
+        border-radius: 20px;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+    }
+
+    #canvasSide::-webkit-scrollbar {
+        display: none;
+    }
+
+    #canvasSide {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+</style>
+<div id="camera">
+    <video id="video">Video stream not
+        available.</video>
     <!-- <div
         style="position: absolute; width: 540px; height: 324px; border: 4px #FFF solid;border-radius: 20px; left: 50px; top: 78px">
     </div> -->
-    <div
-        style="position: absolute; width: 270px; height: 162px; border: 4px #FFF solid;border-radius: 20px; left: 25px; top: 39px">
+    <div id="side">
+    </div>
+    <div id="canvasSide" style="display:none;">
+        <canvas id="canvas">
+        </canvas>
     </div>
 </div>
-<canvas id="canvas">
-</canvas>
+<button id="startbutton">Take photo</button>
+
 <img id="photo">
 <canvas id="canvas2">
 </canvas>
@@ -23,14 +64,22 @@
 
         var streaming = false;
 
+        var camera = null;
         var video = null;
+        var side = null;
         var canvas = null;
+        var canvasSide = null;
         var photo = null;
         var startbutton = null;
         var error = null;
+        let IDWidth = 430;
+        let IDHeight = 270;
         function startup() {
+            camera = document.getElementById('camera');
             video = document.getElementById('video');
+            side = document.getElementById('side');
             canvas = document.getElementById('canvas');
+            canvasSide = document.getElementById('canvasSide');
             photo = document.getElementById('photo');
             startbutton = document.getElementById('startbutton');
             error = document.getElementById('error');
@@ -47,11 +96,29 @@
                 if (!streaming) {
                     // height = video.videoHeight / (video.videoWidth / width);
 
-                    video.setAttribute('width', width);
-                    video.setAttribute('height', height);
-                    canvas.setAttribute('width', width);
-                    canvas.setAttribute('height', height);
+                    error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}`
+
+                    video.setAttribute('width', video.videoWidth + 'px');
+                    video.setAttribute('height', video.videoHeight + 'px');
+                    // video.setAttribute('height', height);
+                    // canvas.setAttribute('width', '100%');
+                    // canvas.setAttribute('height', height);
+                    width = video.videoWidth;
+                    height = video.videoHeight;
+                    // canvasSide.style.width = '100%';
+                    // canvasSide.style.height = video.offsetHeight + 'px';
+                    // canvas.style.width = video.videoWidth + 'px';
+                    // canvas.style.height = video.videoHeight + 'px';
+
                     streaming = true;
+                    // IDWidth = parseInt(camera.offsetWidth * 0.8);
+                    // IDHeight = parseInt(IDWidth * 54 / 86);
+                    side.style.width = IDWidth + 'px';
+                    side.style.height = IDHeight + 'px';
+                    // side.style.left = parseInt((camera.offsetWidth - IDWidth) / 2) + "px";
+                    // side.style.top = parseInt((camera.offsetHeight - IDHeight) / 2) + "px";
+                    // camera.scrollTo((camera.offsetWidth - video.videoWidth) / 2, (camera.offsetHeight - video.videoHeight) / 2);
+
                 }
             }, false);
             startbutton.addEventListener('click', function (ev) {
@@ -70,12 +137,15 @@
         }
         function takepicture() {
             var context = canvas.getContext('2d');
+            console.log(width, height, canvas.offsetWidth, canvas.offsetHeight)
             if (width && height) {
                 canvas.width = width;
                 canvas.height = height;
-                // context.drawImage(video, 0, 0, width, height);
-                context.drawImage(video, 50, 78, 540, 324, 25, 39, 270, 162);
-
+                context.drawImage(video, 0, 0, width, height);
+                // context.drawImage(video, 50, 78, 540, 324, 25, 39, 270, 162);
+                canvasSide.style.removeProperty('display');
+                // console.log('canvasSide SCROLL:',)
+                canvasSide.scrollTo((canvas.offsetWidth - canvasSide.offsetWidth) / 2, (canvas.offsetHeight - canvasSide.offsetHeight) / 2);
                 var data = canvas.toDataURL('image/png');
                 photo.setAttribute('src', data);
 
