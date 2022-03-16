@@ -23,15 +23,15 @@
         z-index: 1;
     }
 
-    #canvasSide::-webkit-scrollbar {
+    #canvasDiv::-webkit-scrollbar {
         display: none;
     }
 
-    #canvasSide {
+    #canvasDiv {
         width: 100%;
         height: 100%;
         overflow: auto;
-        position: absolute;
+        /* position: absolute; */
         left: 0;
         top: 0;
     }
@@ -43,10 +43,10 @@
         style="position: absolute; width: 540px; height: 324px; border: 4px #FFF solid;border-radius: 20px; left: 50px; top: 78px">
     </div> -->
     <div id="side">
-    </div>
-    <div id="canvasSide" style="display:none;">
-        <canvas id="canvas">
-        </canvas>
+        <div id="canvasDiv" style="display:none;">
+            <canvas id="canvas">
+            </canvas>
+        </div>
     </div>
 </div>
 <button id="startbutton">Take photo</button>
@@ -68,7 +68,7 @@
         var video = null;
         var side = null;
         var canvas = null;
-        var canvasSide = null;
+        var canvasDiv = null;
         var photo = null;
         var startbutton = null;
         var error = null;
@@ -79,7 +79,7 @@
             video = document.getElementById('video');
             side = document.getElementById('side');
             canvas = document.getElementById('canvas');
-            canvasSide = document.getElementById('canvasSide');
+            canvasDiv = document.getElementById('canvasDiv');
             photo = document.getElementById('photo');
             startbutton = document.getElementById('startbutton');
             error = document.getElementById('error');
@@ -105,8 +105,8 @@
                     // canvas.setAttribute('height', height);
                     width = video.videoWidth;
                     height = video.videoHeight;
-                    // canvasSide.style.width = '100%';
-                    // canvasSide.style.height = video.offsetHeight + 'px';
+                    // canvasDiv.style.width = '100%';
+                    // canvasDiv.style.height = video.offsetHeight + 'px';
                     // canvas.style.width = video.videoWidth + 'px';
                     // canvas.style.height = video.videoHeight + 'px';
 
@@ -143,9 +143,9 @@
                 canvas.height = height;
                 context.drawImage(video, 0, 0, width, height);
                 // context.drawImage(video, 50, 78, 540, 324, 25, 39, 270, 162);
-                canvasSide.style.removeProperty('display');
-                // console.log('canvasSide SCROLL:',)
-                canvasSide.scrollTo((canvas.offsetWidth - canvasSide.offsetWidth) / 2, (canvas.offsetHeight - canvasSide.offsetHeight) / 2);
+                canvasDiv.style.removeProperty('display');
+                // console.log('canvasDiv SCROLL:',)
+                canvasDiv.scrollTo((canvas.offsetWidth - canvasDiv.offsetWidth) / 2, (canvas.offsetHeight - canvasDiv.offsetHeight) / 2);
                 var data = canvas.toDataURL('image/png');
                 photo.setAttribute('src', data);
 
