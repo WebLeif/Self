@@ -275,9 +275,9 @@
             canvas.addEventListener('gesturechange', function (ev) {
                 let scale = ((gesturechange.scale - 1) / 2) + 1
                 error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}-${scale}`
-                if (scale <= 2 && scale >= 1) {
-                    canvas.style.width = photo.offsetWidth * scale;
-                    canvas.style.height = photo.offsetHeight * scale;
+                if (canvas.offsetWidth * scale <= photo.offsetWidth * 2 && canvas.offsetWidth * scale >= photo.offsetWidth * 1) {
+                    canvas.style.width = canvas.offsetWidth * scale;
+                    canvas.style.height = canvas.offsetHeight * scale;
                 }
                 ev.preventDefault();
             }, false);
