@@ -138,20 +138,6 @@
 
                 }
             }, false);
-            canvas.addEventListener('doubleTouch', function (ev) {
-                console.log(1)
-                if (canvas.offsetWidth == photo.offsetWidth) {
-                    canvas.style.width = photo.offsetWidth * 2;
-                    canvas.style.height = photo.offsetHeight * 2;
-                    console.log(12)
-                }
-                else {
-                    canvas.style.width = photo.offsetWidth;
-                    canvas.style.height = photo.offsetHeight;
-                    console.log(13)
-                }
-                ev.preventDefault();
-            }, false);
             startbutton.addEventListener('click', function (ev) {
                 takepicture();
                 startbutton.style.display = "none";
@@ -268,6 +254,25 @@
                     y = (p1.pageY + p2.pageY) / 2;
                 return [x, y];
             }
+            canvas.addEventListener('doubleTouch', function (ev, g, i) {
+                console.log(1, ev, g, i)
+                if (canvas.offsetWidth == photo.offsetWidth) {
+                    canvas.style.width = photo.offsetWidth * 2;
+                    canvas.style.height = photo.offsetHeight * 2;
+                    console.log(12)
+                }
+                else {
+                    canvas.style.width = photo.offsetWidth;
+                    canvas.style.height = photo.offsetHeight;
+                    console.log(13)
+                }
+                ev.preventDefault();
+            }, false);
+            canvas.addEventListener('gesturechange', function (ev) {
+                canvas.style.width = photo.style.width * gesturechange.scale;
+                canvas.style.height = photo.style.height * gesturechange.scale;
+                ev.preventDefault();
+            }, false);
         }
         function clearphoto() {
             var context = canvas.getContext('2d');
