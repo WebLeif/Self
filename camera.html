@@ -51,7 +51,7 @@
     <!-- <div style="width: 100%;height: 100%;"> -->
     <div>
         <div id="camera">
-            <video id="video">Video stream not available.</video>
+            <video id="video" muted autoplay playsinline>Video stream not available.</video>
             <div id="side">
                 <div id="canvasDiv" style="display:none;">
                     <canvas id="canvas" style="transition:0.1s;">
@@ -128,11 +128,11 @@
                 .then(function (stream) {
                     if ("srcObject" in video) {
                         video.srcObject = stream;
+                        video.play();
                     } else {
                         // Avoid using this in new browsers
                         video.src = window.URL.createObjectURL(stream);
                     }
-                    video.play();
                 })
                 .catch(function (err) {
                     console.log("An error occured! " + err);
