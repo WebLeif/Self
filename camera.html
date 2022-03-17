@@ -120,8 +120,8 @@
             navigator.mediaDevices.getUserMedia({
                 audio: false, video: {
                     facingMode: "environment",
-                    width: { min: 640, ideal: 1280, max: 1280 },
-                    height: { min: 480, ideal: 960, max: 960 }
+                    width: { min: 640, ideal: 960, max: 960 },
+                    height: { min: 640, ideal: 960, max: 960 }
                 }
             })
                 .then(function (stream) {
@@ -325,6 +325,7 @@
         }
         function canvaRrotate(n) {
             var context = canvas.getContext('2d');
+            let scale = width / photo.offsetWidth;
             angle += n;
             if (angle >= 360)
                 angle -= 360;
@@ -373,7 +374,8 @@
                     dy = 0;
                     break;
             }
-            context.drawImage(photo, 0, 0, photo.offsetWidth * 2, photo.offsetHeight * 2, dx, dy, photo.offsetWidth * 2, photo.offsetHeight * 2);
+
+            context.drawImage(photo, 0, 0, photo.offsetWidth * scale, photo.offsetHeight * scale, dx, dy, photo.offsetWidth * scale, photo.offsetHeight * scale);
 
         }
         function Langle() {
