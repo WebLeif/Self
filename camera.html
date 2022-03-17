@@ -294,7 +294,7 @@
                 ev.preventDefault();
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
-                let scale = ((gesturechange.scale - 1) / sen) + 1
+                let scale = ((gesturechange.scale - 1) / sens) + 1
                 error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}-${scale}`
                 var nums = [90, 270, -90 - 270]
                 let w;
