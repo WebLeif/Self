@@ -254,7 +254,7 @@
                     y = (p1.pageY + p2.pageY) / 2;
                 return [x, y];
             }
-            canvas.addEventListener('doubleTouch', function (ev, g, i) {
+            canvas.addEventListener('doubleTouch', function (ev) {
                 console.log(1, ev, g, i)
                 if (canvas.offsetWidth == photo.offsetWidth) {
                     canvas.style.width = photo.offsetWidth * 2;
@@ -269,8 +269,10 @@
                 ev.preventDefault();
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
-                canvas.style.width = photo.style.width * gesturechange.scale;
-                canvas.style.height = photo.style.height * gesturechange.scale;
+                error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}`
+
+                canvas.style.width = photo.offsetWidth * gesturechange.scale;
+                canvas.style.height = photo.offsetHeight * gesturechange.scale;
                 ev.preventDefault();
             }, false);
         }
