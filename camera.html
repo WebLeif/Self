@@ -255,24 +255,22 @@
                 return [x, y];
             }
             canvas.addEventListener('doubleTouch', function (ev) {
-                console.log(1, ev, g, i)
                 if (canvas.offsetWidth == photo.offsetWidth) {
                     canvas.style.width = photo.offsetWidth * 2;
                     canvas.style.height = photo.offsetHeight * 2;
-                    console.log(12)
                 }
                 else {
                     canvas.style.width = photo.offsetWidth;
                     canvas.style.height = photo.offsetHeight;
-                    console.log(13)
                 }
                 ev.preventDefault();
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
                 error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}`
-
-                canvas.style.width = photo.offsetWidth * gesturechange.scale;
-                canvas.style.height = photo.offsetHeight * gesturechange.scale;
+                if (gesturechange.scale <= 2 && gesturechange.scale >= 1) {
+                    canvas.style.width = photo.offsetWidth * gesturechange.scale;
+                    canvas.style.height = photo.offsetHeight * gesturechange.scale;
+                }
                 ev.preventDefault();
             }, false);
         }
