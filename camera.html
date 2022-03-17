@@ -4,7 +4,7 @@
         position: relative;
         overflow: hidden;
         width: 100%;
-        height: 40%;
+        /* height: 40%; */
         transition: 1s;
     }
 
@@ -45,37 +45,42 @@
         font-size: 20px;
     }
 </style>
-<div id="camera">
-    <video id="video">Video stream not available.</video>
-    <div id="side">
-        <div id="canvasDiv" style="display:none;">
-            <canvas id="canvas">
-            </canvas>
+<div style="width: 100%;height: 100%;overflow: hidden;">
+    <div style="width: 100%;height: 100%;">
+        <div id="camera">
+            <video id="video">Video stream not available.</video>
+            <div id="side">
+                <div id="canvasDiv" style="display:none;">
+                    <canvas id="canvas">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button id="startbutton" style="display: none;">喀嚓</button>
+            <br>
+            <button id="lbutton" style="display: none;">左旋</button>
+            <button id="rbutton" style="display: none;">右璇</button>
+            <br>
+            <button id="enterbutton" style="display: none;">確認</button>
+            <button id="resetbutton" style="display: none;">取消</button>
+        </div>
+        <div id="error">
+
         </div>
     </div>
-</div>
-<div>
-    <button id="startbutton" style="display: none;">喀嚓</button>
-    <br>
-    <button id="lbutton" style="display: none;">左旋</button>
-    <button id="rbutton" style="display: none;">右璇</button>
-    <br>
-    <button id="enterbutton" style="display: none;">確認</button>
-    <button id="resetbutton" style="display: none;">取消</button>
-</div>
-<img id="photo">
-<canvas id="canvas2" style="display: none;">
-</canvas>
-<div id="error">
+    <img id="photo">
 
+    <canvas id="canvas2" style="display: none;">
+    </canvas>
 </div>
 <script>
     (function () {
         var width;    // We will scale the photo width to this
         var height;     // This will be computed based on the input stream
         // 剪裁大小
-        let IDWidth = 258;
-        let IDHeight = 162;
+        let IDWidth = 516;
+        let IDHeight = 324;
         let angle = 0;
 
         var streaming = false;
@@ -119,7 +124,9 @@
             video.addEventListener('canplay', function (ev) {
                 if (!streaming) {
                     error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}`
+                    pageHeight = document.documentElement.scrollHeight;
 
+                    camera.style.height = parseInt((camera.offsetWidth * video.videoHeight / video.videoWidth) / pageHeight * 100) + '%';
                     width = video.videoWidth;
                     height = video.videoHeight;
                     canvas.style.width = video.offsetWidth + 'px';
@@ -131,7 +138,7 @@
 
                 }
             }, false);
-            canvas.addEventListener('doubleTap', function (ev) {
+            canvas.addEventListener('doubleTouch', function (ev) {
                 console.log(1)
                 if (canvas.offsetWidth == photo.offsetWidth) {
                     canvas.style.width = photo.offsetWidth * 2;
@@ -180,6 +187,87 @@
                 ev.preventDefault();
             }, false);
             // clearphoto();
+            var isTouch = false;
+            var isDoubleTouch = false; //是否為多觸點   
+            var start = []; //存放觸點坐標
+            var now, delta; //當前時間，兩次觸發事件時間差
+            var startPosition, movePosition, endPosition; //滑動起點，移動，結束點坐標
+            //事件聲明
+            var gesturestart = new CustomEvent('gesturestart');
+            var gesturechange = new CustomEvent('gesturechange');
+            var gestureend = new CustomEvent('gestureend');
+            var swipeMove = new CustomEvent('swipeMove');
+            var doubleTouch = new CustomEvent("doubleTouch");
+            //監聽touchstart事件
+            canvas.addEventListener('touchstart', function (e) {
+                if (e.touches.length >= 2) { //判斷是否有兩個點在屏幕上
+                    isDoubleTouch = true;
+                    start = e.touches; //得到第一組兩個點
+                    var screenMinPoint = getMidpoint(start[0], start[1]); //獲取兩個觸點中心坐標
+                    gesturestart.midPoint = [screenMinPoint[0] - e.target.offsetLeft, screenMinPoint[1] - e.target.offsetTop]; //獲取中心點坐標相對目標元素坐標
+                    e.target.dispatchEvent(gesturestart);
+                } else {
+                    delta = Date.now() - now; //計算兩次點擊時間差
+                    now = Date.now();
+                    startPosition = [e.touches[0].pageX, e.touches[0].pageY];
+                    if (delta > 0 && delta <= 250) { //雙擊事件
+                        doubleTouch.position = [e.touches[0].pageX - e.target.offsetLeft, e.touches[0].pageY - e.target.offsetTop];
+                        e.target.dispatchEvent(doubleTouch);
+                    } else { //滑動事件
+                        isTouch = true;
+                    }
+                }
+            }, false);
+            //監聽touchmove事件
+            canvas.addEventListener('touchmove', function (e) {
+                if (e.touches.length >= 2 && isDoubleTouch) { //手勢事件
+                    var now = e.touches; //得到第二組兩個點
+                    var scale = getDistance(now[0], now[1]) / getDistance(start[0], start[1]); //得到縮放比例
+                    var rotation = getAngle(now[0], now[1]) - getAngle(start[0], start[1]); //得到旋轉角度差
+                    gesturechange.scale = scale.toFixed(2);
+                    gesturechange.rotation = rotation.toFixed(2);
+                    e.target.dispatchEvent(gesturechange);
+                } else if (isTouch) {
+                    movePosition = [e.touches[0].pageX, e.touches[0].pageY];
+                    endPosition = movePosition;
+                    movePosition = [movePosition[0] - startPosition[0], movePosition[1] - startPosition[1]];
+                    startPosition = [e.touches[0].pageX, e.touches[0].pageY];
+                    swipeMove.distance = [movePosition[0].toFixed(2), movePosition[1].toFixed(2)];
+                    e.target.dispatchEvent(swipeMove);
+                }
+            }, false);
+            //監聽touchend事件
+            canvas.addEventListener('touchend', function (e) {
+                if (isDoubleTouch) {
+                    isDoubleTouch = false;
+                    gestureend.position = endPosition;
+                    e.target.dispatchEvent(gestureend);
+                };
+            }, false);
+            /*
+             * 兩點的距離
+             */
+            function getDistance(p1, p2) {
+                var x = p2.pageX - p1.pageX,
+                    y = p2.pageY - p1.pageY;
+                return Math.sqrt((x * x) + (y * y));
+            };
+            /*
+             * 兩點的夾角
+             */
+            function getAngle(p1, p2) {
+                var x = p1.pageX - p2.pageX,
+                    y = p1.pageY - p2.pageY;
+                return Math.atan2(y, x) * 180 / Math.PI;
+            };
+            /*
+             * 獲取中點 
+             */
+            function getMidpoint(p1, p2) {
+                var x = (p1.pageX + p2.pageX) / 2,
+                    y = (p1.pageY + p2.pageY) / 2;
+                return [x, y];
+            }
         }
         function clearphoto() {
             var context = canvas.getContext('2d');
