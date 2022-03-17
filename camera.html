@@ -5,7 +5,6 @@
         overflow: hidden;
         width: 100%;
         /* height: 40%; */
-        transition: 1s;
     }
 
     #video {
@@ -20,7 +19,7 @@
         position: absolute;
         transform: translate(-50%, -50%);
         border-radius: 20px;
-        /* border: 2px #888 solid; */
+        width: 80%;
         outline: 4px #888 solid;
         left: 50%;
         top: 50%;
@@ -33,7 +32,6 @@
 
     #canvasDiv {
         border-radius: 20px;
-        /* border: 2px #888 solid; */
         outline: 4px #888 solid;
         width: 100%;
         height: 100%;
@@ -83,9 +81,6 @@
     (function () {
         var width;    // We will scale the photo width to this
         var height;     // This will be computed based on the input stream
-        // 剪裁大小
-        let IDWidth = 258;
-        let IDHeight = 162;
         let angle = 0;
 
         var streaming = false;
@@ -142,8 +137,7 @@
                     height = video.videoHeight;
                     canvas.style.width = video.offsetWidth + 'px';
                     canvas.style.height = video.offsetHeight + 'px';
-                    side.style.width = IDWidth + 'px';
-                    side.style.height = IDHeight + 'px';
+                    side.style.height = (side.offsetWidth * 54 / 86) + 'px';
                     streaming = true;
                     startbutton.style.removeProperty('display');
 
@@ -174,6 +168,7 @@
                 ev.preventDefault();
             }, false);
             resetbutton.addEventListener('click', function (ev) {
+                angle = 0;
                 startbutton.style.removeProperty('display');
                 rbutton.style.display = "none";
                 lbutton.style.display = "none";
@@ -266,20 +261,39 @@
                 return [x, y];
             }
             canvas.addEventListener('doubleTouch', function (ev) {
-                if (canvas.offsetWidth == photo.offsetWidth) {
-                    canvas.style.width = photo.offsetWidth * 2;
-                    canvas.style.height = photo.offsetHeight * 2;
+                var nums = [90, 270, -90 - 270]
+                let h, w;
+                if (nums.indexOf(angle) >= 0) {
+                    h = photo.offsetWidth;
+                    w = photo.offsetHeight;
                 }
                 else {
-                    canvas.style.width = photo.offsetWidth;
-                    canvas.style.height = photo.offsetHeight;
+                    w = photo.offsetWidth;
+                    h = photo.offsetHeight;
                 }
+                if (canvas.offsetWidth < w * 3) {
+                    canvas.style.width = w * 3;
+                    canvas.style.height = h * 3;
+                }
+                else {
+                    canvas.style.width = w;
+                    canvas.style.height = h;
+                }
+                canvasFixSize();
                 ev.preventDefault();
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
                 let scale = ((gesturechange.scale - 1) / 2) + 1
                 error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}-${scale}`
-                if (canvas.offsetWidth * scale <= photo.offsetWidth * 2 && canvas.offsetWidth * scale >= photo.offsetWidth * 1) {
+                var nums = [90, 270, -90 - 270]
+                let w;
+                if (nums.indexOf(angle) >= 0) {
+                    w = photo.offsetHeight;
+                }
+                else {
+                    w = photo.offsetWidth;
+                }
+                if (canvas.offsetWidth * scale <= w * 3 && canvas.offsetWidth * scale >= w) {
                     canvas.style.width = canvas.offsetWidth * scale;
                     canvas.style.height = canvas.offsetHeight * scale;
                 }
@@ -314,12 +328,12 @@
         }
         function enterpicture() {
             var m = canvas.width / canvas.offsetWidth;
-            canvas2.width = IDWidth;
-            canvas2.height = IDHeight;
-            photo.width = IDWidth;
-            photo.height = IDHeight;
+            canvas2.width = side.offsetWidth;
+            canvas2.height = side.offsetHeight;
+            photo.width = side.offsetWidth;
+            photo.height = side.offsetHeight;
             var context = canvas2.getContext('2d');
-            context.drawImage(canvas, (0 + canvasDiv.scrollLeft) * m, (0 + canvasDiv.scrollTop) * m, IDWidth * m, IDHeight * m, 0, 0, IDWidth, IDHeight);
+            context.drawImage(canvas, (0 + canvasDiv.scrollLeft) * m, (0 + canvasDiv.scrollTop) * m, side.offsetWidth * m, side.offsetHeight * m, 0, 0, side.offsetWidth, side.offsetHeight);
             var data = canvas2.toDataURL('image/png');
             photo.setAttribute('src', data);
         }
@@ -374,10 +388,13 @@
                     break;
             }
             context.drawImage(photo, dx, dy);
-
+            canvasFixSize();
         }
-        function Langle() {
-
+        function canvasFixSize() {
+            if (canvas.offsetWidth < side.offsetWidth) {
+                canvas.style.height = canvas.offsetHeight * side.offsetWidth / canvas.offsetWidth + 'px';
+                canvas.style.width = side.offsetWidth + 'px';
+            }
         }
         // 加载完毕后开始运行
         window.addEventListener("load", startup, false);
