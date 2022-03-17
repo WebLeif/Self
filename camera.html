@@ -325,7 +325,6 @@
         }
         function canvaRrotate(n) {
             var context = canvas.getContext('2d');
-            let scale = width / photo.offsetWidth;
             angle += n;
             if (angle >= 360)
                 angle -= 360;
@@ -374,8 +373,7 @@
                     dy = 0;
                     break;
             }
-
-            context.drawImage(photo, 0, 0, photo.offsetWidth * scale, photo.offsetHeight * scale, dx, dy, photo.offsetWidth * scale, photo.offsetHeight * scale);
+            context.drawImage(photo, dx, dy);
 
         }
         function Langle() {
