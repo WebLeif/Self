@@ -79,8 +79,10 @@
 </div>
 <script>
     (function () {
-        var width;    // We will scale the photo width to this
-        var height;     // This will be computed based on the input stream
+        const scaleMax = 3;
+
+        var width;
+        var height;
         let angle = 0;
 
         var streaming = false;
@@ -274,9 +276,9 @@
                     w = photo.offsetWidth;
                     h = photo.offsetHeight;
                 }
-                if (canvas.offsetWidth < w * 3) {
-                    canvas.style.width = w * 3;
-                    canvas.style.height = h * 3;
+                if (canvas.offsetWidth < w * scaleMax) {
+                    canvas.style.width = w * scaleMax;
+                    canvas.style.height = h * scaleMax;
                 }
                 else if (w < side.offsetWidth) {
                     canvas.style.width = side.offsetWidth + 'px';
@@ -298,7 +300,7 @@
                 else {
                     w = photo.offsetWidth;
                 }
-                if (canvas.offsetWidth * scale <= w * 3 && canvas.offsetWidth * scale >= w & w > side.offsetWidth) {
+                if (canvas.offsetWidth * scale <= w * scaleMax && canvas.offsetWidth * scale >= w & w > side.offsetWidth) {
                     canvas.style.width = canvas.offsetWidth * scale;
                     canvas.style.height = canvas.offsetHeight * scale;
                 }
@@ -335,8 +337,8 @@
             var m = canvas.width / canvas.offsetWidth;
             canvas2.width = side.offsetWidth * m;
             canvas2.height = side.offsetHeight * m;
-            photo.width = side.offsetWidth * m;
-            photo.height = side.offsetHeight * m;
+            photo.width = side.offsetWidth;
+            photo.height = side.offsetHeight;
             var context = canvas2.getContext('2d');
             context.drawImage(canvas, (0 + canvasDiv.scrollLeft) * m, (0 + canvasDiv.scrollTop) * m, side.offsetWidth * m, side.offsetHeight * m, 0, 0, side.offsetWidth * m, side.offsetHeight * m);
             var data = canvas2.toDataURL('image/png');
