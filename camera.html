@@ -46,7 +46,8 @@
     }
 </style>
 <div style="width: 100%;height: 100%;overflow: hidden;">
-    <div style="width: 100%;height: 100%;">
+    <!-- <div style="width: 100%;height: 100%;"> -->
+    <div>
         <div id="camera">
             <video id="video">Video stream not available.</video>
             <div id="side">
@@ -79,8 +80,8 @@
         var width;    // We will scale the photo width to this
         var height;     // This will be computed based on the input stream
         // 剪裁大小
-        let IDWidth = 516;
-        let IDHeight = 324;
+        let IDWidth = 258;
+        let IDHeight = 162;
         let angle = 0;
 
         var streaming = false;
@@ -266,10 +267,11 @@
                 ev.preventDefault();
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
-                error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}`
-                if (gesturechange.scale <= 2 && gesturechange.scale >= 1) {
-                    canvas.style.width = photo.offsetWidth * gesturechange.scale;
-                    canvas.style.height = photo.offsetHeight * gesturechange.scale;
+                let scale = ((gesturechange.scale - 1) / 2) + 1
+                error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}-${scale}`
+                if (scale <= 2 && scale >= 1) {
+                    canvas.style.width = photo.offsetWidth * scale;
+                    canvas.style.height = photo.offsetHeight * scale;
                 }
                 ev.preventDefault();
             }, false);
