@@ -54,7 +54,7 @@
             <video id="video">Video stream not available.</video>
             <div id="side">
                 <div id="canvasDiv" style="display:none;">
-                    <canvas id="canvas" style="transition:0.3s;">
+                    <canvas id="canvas" style="transition:0.1s;">
                     </canvas>
                 </div>
             </div>
@@ -405,7 +405,7 @@
             }
             context.drawImage(photo, dx, dy);
             setTimeout(function () {
-                canvas.style.transition = "0.3s";
+                canvas.style.transition = "0.1s";
             }, 0);
         }
         // 加载完毕后开始运行
