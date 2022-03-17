@@ -80,7 +80,11 @@
 <script>
     (function () {
         const scaleMax = 3;
-
+        let sens = 2;
+        var n = parseInt(prompt('縮放靈敏度(值越大靈敏度越低):', sens));
+        if (n && !isNaN(n)) {
+            sens = n;
+        }
         var width;
         var height;
         let angle = 0;
@@ -290,7 +294,7 @@
                 ev.preventDefault();
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
-                let scale = ((gesturechange.scale - 1) / 2) + 1
+                let scale = ((gesturechange.scale - 1) / sen) + 1
                 error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\n${gesturechange.scale}-${scale}`
                 var nums = [90, 270, -90 - 270]
                 let w;
