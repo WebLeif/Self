@@ -305,17 +305,17 @@
             canvas.addEventListener('gesturechange', function (ev) {
                 // let scale = ((gesturechange.scale - 1) / sens) + 1
                 error.innerText = `VW:${video.videoWidth};VH:${video.videoHeight}\nCW${canvaswidth}CH${canvasheight}\n${gesturechange.scale}`
-                // var nums = [90, 270, -90 - 270]
-                // let w, h;
-                // if (nums.indexOf(angle) >= 0) {
-                //     w = photo.offsetHeight;
-                //     h = photo.offsetWidth;
-                // }
-                // else {
-                //     w = photo.offsetWidth;
-                //     h = photo.offsetHeight;
-                // }
-                if (gesturechange.scale <= scaleMax && canvaswidth * gesturechange.scale >= side.offsetWidth) {
+                var nums = [90, 270, -90 - 270]
+                let w, h;
+                if (nums.indexOf(angle) >= 0) {
+                    w = photo.offsetHeight;
+                    // h = photo.offsetWidth;
+                }
+                else {
+                    w = photo.offsetWidth;
+                    // h = photo.offsetHeight;
+                }
+                if (canvaswidth * gesturechange.scale <= w * scaleMax && canvaswidth * gesturechange.scale >= side.offsetWidth) {
                     canvas.style.width = canvaswidth * gesturechange.scale;
                     canvas.style.height = canvasheight * gesturechange.scale;
                 }
