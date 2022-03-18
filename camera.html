@@ -91,6 +91,8 @@
 
         var canvaswidth;
         var canvasheight;
+        var canvasDivscrollLeft;
+        var canvasDivscrollHeight;
         var streaming = false;
 
         var camera = null;
@@ -166,11 +168,11 @@
                 ev.preventDefault();
             }, false);
             rbutton.addEventListener('click', function (ev) {
-                canvaRrotate(90);
+                canvaRotate(90);
                 ev.preventDefault();
             }, false);
             lbutton.addEventListener('click', function (ev) {
-                canvaRrotate(-90);
+                canvaRotate(-90);
                 ev.preventDefault();
             }, false);
             enterbutton.addEventListener('click', function (ev) {
@@ -303,6 +305,8 @@
             canvas.addEventListener('touchstart', function (e) {
                 canvaswidth = canvas.offsetWidth;
                 canvasheight = canvas.offsetHeight;
+                canvasDivscrollLeft = canvasDiv.scrollLeft;
+                canvasDivscrollHeight = canvasDiv.scrollHeight;
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
                 // let scale = ((gesturechange.scale - 1) / sens) + 1
@@ -320,6 +324,8 @@
                 if (canvaswidth * gesturechange.scale <= w * scaleMax && canvaswidth * gesturechange.scale >= side.offsetWidth) {
                     canvas.style.width = canvaswidth * gesturechange.scale;
                     canvas.style.height = canvasheight * gesturechange.scale;
+                    canvasDiv.scrollLeft = (canvas.offsetWidth - canvaswidth) / 2 + canvasDiv.scrollLeft;
+                    canvasDiv.scrollHeight = (canvas.offsetHeight - canvasheight) / 2 + canvasDiv.scrollHeight;
                 }
                 ev.preventDefault();
             }, false);
@@ -361,7 +367,7 @@
             var data = canvas2.toDataURL('image/png');
             photo.setAttribute('src', data);
         }
-        function canvaRrotate(n) {
+        function canvaRotate(n) {
             canvas.style.removeProperty('transition');
             var context = canvas.getContext('2d');
             angle += n;
