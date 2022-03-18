@@ -299,8 +299,8 @@
                 ev.preventDefault();
             }, false);
             canvas.addEventListener('touchstart', function (e) {
-                var canvaswidth = canvas.offsetWidth;
-                var canvasheight = canvas.offsetHeight;
+                canvaswidth = canvas.offsetWidth;
+                canvasheight = canvas.offsetHeight;
             }, false);
             canvas.addEventListener('gesturechange', function (ev) {
                 // let scale = ((gesturechange.scale - 1) / sens) + 1
